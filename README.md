@@ -1,3 +1,3 @@
-# ade02-backend
+# GRAVATA ONLINE
 
-Repositório para armazenar o backend do Sistema ADE02 
+Repositório para armazenar o backend do módulo de autenticação do GRAVATA ONLINE. 
