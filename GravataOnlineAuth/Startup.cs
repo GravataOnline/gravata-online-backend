@@ -36,6 +36,9 @@ namespace GravataOnlineAuth
             Configuration = configuration;
 
             Base.DBTYPE = Configuration["Settings:TIPOBANCO"];
+            Base.JWTKEY = Configuration["Jwt:Key"];
+            Base.ISSUER = Configuration["Jwt:Issuer"];
+            Base.AUDIENCE = Configuration["Jwt:Audience"];
             switch (Base.DBTYPE)
             {
                 case "SQL":
@@ -68,11 +71,29 @@ namespace GravataOnlineAuth
                 .AllowAnyMethod());
             });
 
+            services.AddAuthentication
+                 (JwtBearerDefaults.AuthenticationScheme)
+                 .AddJwtBearer(options =>
+                  {
+                      options.TokenValidationParameters = new TokenValidationParameters
+                      {
+                          ValidateIssuer = true,
+                          ValidateAudience = true,
+                          ValidateLifetime = true,
+                          ValidateIssuerSigningKey = true,
+
+                          ValidIssuer = Configuration["Jwt:Issuer"],
+                          ValidAudience = Configuration["Jwt:Audience"],
+                          IssuerSigningKey = new SymmetricSecurityKey
+                        (Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
+                      };
+                  });
+            services.AddSingleton<IConfiguration>(Configuration);
             services.AddControllers();
             services.AddSwaggerGen(swagger =>
             {
-                    //This is to generate the Default UI of Swagger Documentation
-                    swagger.SwaggerDoc("v1", new OpenApiInfo
+                //This is to generate the Default UI of Swagger Documentation
+                swagger.SwaggerDoc("v1", new OpenApiInfo
                 {
                     Title = "Gravata Online - Autorização e Autenticação",
                     Version = "v1",
@@ -88,8 +109,8 @@ namespace GravataOnlineAuth
                     }
 
                 });
-                    // To Enable authorization using Swagger (JWT)
-                    swagger.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
+                // To Enable authorization using Swagger (JWT)
+                swagger.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
                 {
                     Name = "Authorization",
                     Type = SecuritySchemeType.ApiKey,
@@ -130,6 +151,7 @@ namespace GravataOnlineAuth
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+            app.UseAuthentication();
             app.UseExceptionHandler(errorApp =>
             {
                 errorApp.Run(async context =>

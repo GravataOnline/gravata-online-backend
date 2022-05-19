@@ -11,6 +11,9 @@ namespace GravataOnlineAuth.Common
         public static string DBTYPE { get; set; }
         public static string CONNECTIONSTRING { get; set; }
         public static string AUTHCONNECTIONSTRING { get; set; }
+        public static string JWTKEY { get; set; }
+        public static string ISSUER { get; set; }
+        public static string AUDIENCE { get; set; }
     }
 
    

@@ -6,7 +6,9 @@ using GravataOnlineAuth.Models.User;
 using GravataOnlineAuth.Scripts.PasswordRequest;
 using GravataOnlineAuth.Scripts.User;
 using Microsoft.AspNetCore.Http;
+using Microsoft.IdentityModel.Tokens;
 using System;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -44,6 +46,8 @@ namespace GravataOnlineAuth.Repository.User
                 if (input.SPOUSE != null)
                 {
                     UserModel spouse = input.SPOUSE;
+                    spouse.SENHA = null;
+                    spouse.SALT = null;
                     var spouseid = ExecuteReturning<int>(scripts.Create(spouse)).FirstOrDefault();
                     var requesttoken = CreateRequest(spouse.EMAIL);
                     var message2 = @$"Olá {user.NOME}, seja bem vindo(a) á Gravata Online!
@@ -155,6 +159,20 @@ namespace GravataOnlineAuth.Repository.User
             {
                 throw new Exception(ex.Message);
             }
+        }
+
+        public string GerarTokenJWT()
+        {
+            var issuer = Base.ISSUER;
+            var audience = Base.AUDIENCE;
+            var expiry = DateTime.Now.AddMinutes(120);
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Base.JWTKEY));
+            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+            var token = new JwtSecurityToken(issuer: issuer, audience: audience,
+                expires: DateTime.Now.AddMinutes(120), signingCredentials: credentials);
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var stringToken = tokenHandler.WriteToken(token);
+            return stringToken;
         }
 
     }

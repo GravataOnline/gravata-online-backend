@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace GravataOnlineAuth.Controllers.User
@@ -47,7 +48,13 @@ namespace GravataOnlineAuth.Controllers.User
         [HttpPost("login")]
         public IActionResult Login(LoginInputModel user)
         {
-            return BaseResponse(_invoices.Login(user));
+            var info = _invoices.Login(user);
+            if(info.Item1 == HttpStatusCode.OK)
+            {
+                var token = _invoices.GerarTokenJWT();
+                Response.Headers.Add("Authorization", "Bearer " + token);
+            }
+            return BaseResponse(info);
         }
 
         /// <summary>
