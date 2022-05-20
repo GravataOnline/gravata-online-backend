@@ -49,11 +49,6 @@ namespace GravataOnlineAuth.Controllers.User
         public IActionResult Login(LoginInputModel user)
         {
             var info = _invoices.Login(user);
-            if(info.Item1 == HttpStatusCode.OK)
-            {
-                var token = _invoices.GerarTokenJWT();
-                Response.Headers.Add("Authorization", "Bearer " + token);
-            }
             return BaseResponse(info);
         }
 

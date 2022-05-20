@@ -14,6 +14,5 @@ namespace GravataOnlineAuth.Repository.User
         (HttpStatusCode, dynamic) Login(LoginInputModel input);
         Task<(HttpStatusCode, dynamic)> RequestPasswordReset(string email);
         Task<(HttpStatusCode, dynamic)> UpdatePassword(string token, string password);
-        public string GerarTokenJWT();
     }
 }

@@ -77,6 +77,7 @@ namespace GravataOnlineAuth.Repository.User
                 if (user == null) return (HttpStatusCode.BadRequest, "Usuário não existe!");
                 if (user.SENHA != Hash.GetHash(Convert.ToBase64String(Encoding.ASCII.GetBytes(input.PASSWORD)), user.SALT)) return (HttpStatusCode.BadRequest, "Senha incorreta!");
                 UserViewModel information = user;
+                information.TOKEN = this.GerarTokenJWT();
                 return (HttpStatusCode.OK, information);
             }
             catch (Exception ex)
@@ -161,7 +162,7 @@ namespace GravataOnlineAuth.Repository.User
             }
         }
 
-        public string GerarTokenJWT()
+        private string GerarTokenJWT()
         {
             var issuer = Base.ISSUER;
             var audience = Base.AUDIENCE;
