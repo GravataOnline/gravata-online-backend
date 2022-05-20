@@ -11,6 +11,7 @@ using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -77,8 +78,22 @@ namespace GravataOnlineAuth.Repository.User
                 if (user == null) return (HttpStatusCode.BadRequest, "Usuário não existe!");
                 if (user.SENHA != Hash.GetHash(Convert.ToBase64String(Encoding.ASCII.GetBytes(input.PASSWORD)), user.SALT)) return (HttpStatusCode.BadRequest, "Senha incorreta!");
                 UserViewModel information = user;
-                information.TOKEN = this.GerarTokenJWT();
+                information.TOKEN = this.GerarTokenJWT(user);
                 return (HttpStatusCode.OK, information);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public (HttpStatusCode, dynamic) GetUserById(int id)
+        {
+            try
+            {
+                UserViewModel user = Query<UserModel>(scripts.GetUserById(id)).FirstOrDefault();
+                if (user == null) return (HttpStatusCode.BadRequest, "Usuário não existe!");
+                return (HttpStatusCode.OK, user);
             }
             catch (Exception ex)
             {
@@ -162,18 +177,21 @@ namespace GravataOnlineAuth.Repository.User
             }
         }
 
-        private string GerarTokenJWT()
+        private string GerarTokenJWT(UserModel user)
         {
+            DateTime issuedAt = DateTime.UtcNow;
+            var tokenHandler = new JwtSecurityTokenHandler();
             var issuer = Base.ISSUER;
             var audience = Base.AUDIENCE;
-            var expiry = DateTime.Now.AddMinutes(120);
+            var expiry = DateTime.UtcNow.AddMinutes(120);
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Base.JWTKEY));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-            var token = new JwtSecurityToken(issuer: issuer, audience: audience,
-                expires: DateTime.Now.AddMinutes(120), signingCredentials: credentials);
-            var tokenHandler = new JwtSecurityTokenHandler();
+            var token = new JwtSecurityToken(issuer: issuer, audience: audience, 
+            expires: DateTime.Now.AddMinutes(120), signingCredentials: credentials);
+            token.Payload["idusuario"] = user.ID;
             var stringToken = tokenHandler.WriteToken(token);
             return stringToken;
+
         }
 
     }

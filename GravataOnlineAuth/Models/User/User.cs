@@ -49,7 +49,7 @@ namespace GravataOnlineAuth.Models.User
         public string EMAIL { get; set; }
         public UserType TIPOUSUARIO { get; set; }
         public Spouse CONJUGE { get; set; }
-        public string TOKEN { get; set; }
+        public string TOKEN { get; set; } 
         public static implicit operator UserViewModel(UserModel user)
         {
             return new UserViewModel

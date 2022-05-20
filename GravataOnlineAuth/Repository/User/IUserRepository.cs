@@ -12,6 +12,7 @@ namespace GravataOnlineAuth.Repository.User
     {
         Task<(HttpStatusCode, dynamic)> CreateUser(CreateUsersInputModel input);
         (HttpStatusCode, dynamic) Login(LoginInputModel input);
+        (HttpStatusCode, dynamic) GetUserById(int id);
         Task<(HttpStatusCode, dynamic)> RequestPasswordReset(string email);
         Task<(HttpStatusCode, dynamic)> UpdatePassword(string token, string password);
     }

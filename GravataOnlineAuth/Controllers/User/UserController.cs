@@ -78,8 +78,11 @@ namespace GravataOnlineAuth.Controllers.User
             return BaseResponse(await _invoices.UpdatePassword(token, password));
         }
 
-
-
+        [HttpGet("get-user-by-id")]
+        public IActionResult GetUserById(int id)
+        {
+            return BaseResponse( _invoices.GetUserById(id));
+        }
     }
 }
 
